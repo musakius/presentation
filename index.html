@@ -1,0 +1,545 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>reveal.js</title>
+
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/black.css" id="theme">
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section data-background-color="rgb(85, 53, 145)">
+				<h1>
+					<img style="margin-bottom: -30px; width: 155px;" src="./img/angular-logo.svg" alt="angular-logo">
+					Angular
+				</h1>
+			</section>
+			<section data-background-color="rgb(85, 53, 145)">
+				<h2>
+					Application structure
+					<div>
+						<img src="./img/module.jpg" alt="module">
+					</div>
+				</h2>
+			</section>
+			<section data-background-color="rgb(85, 53, 145)">
+				<h2>Modules</h2>
+				<pre>
+					<code data-trim data-noescape>
+					import { BrowserModule } from '@angular/platform-browser';
+					import { NgModule } from '@angular/core';
+					import { AppComponent } from './app.component';
+ 
+					@NgModule({
+  			  imports: [BrowserModule],
+  			  declarations: [AppComponent],
+					  bootstrap: [AppComponent],
+					  exports: [],
+			    providers: []
+					})
+
+					export class AppModule { }
+					</code>
+				</pre>
+			</section>
+			<section data-background-color="rgb(85, 53, 145)">
+				<h3>Component</h3>
+				<pre style="top: -20px;">
+					<code data-trim data-noescape>
+						<script type="text/template">
+						import { Component } from '@angular/core';
+
+						@Component({
+						  selector: 'my-app',
+						  templateUrl: './my-app.component.html',
+						  styleUrls: ['./my-app.component.css'] 
+						})
+
+						export class AppComponent {}
+						</script>
+					</code>
+				</pre>
+				<pre style="top: -65px">
+					<code data-trim data-noescape>
+						<script type="text/template">
+						import { Component } from '@angular/core';
+
+						@Component({
+						  selector: 'my-app',
+						  template: `<h1>Welcome!></h1>`,
+						  styles: [`h1{color: #ffffff;}`]
+						})
+
+						export class AppComponent {}
+						</script>
+					</code>
+				</pre>
+			</section>
+			<section data-background-color="rgb(85, 53, 145)">
+				<h3>Data bindings</h3>
+				<pre style="font-size: 0.45em;">
+					<code data-trim data-noescape>
+						<script type="text/template">
+						@Component({
+						  selector: 'my-app',
+						  template: `
+						   <h1>elcome{{name}}!</h1>
+						   <input type="text" [value]="name">
+						   <button>(click)="increase()">Click</button>
+						   <input [(ngModel)]="name" placeholder="name"></code>`
+						})
+						export class AppComponent { 
+						  name: string = "Tom";
+						  count: number = 0;
+
+						  increase() : void {
+						    this.count++;
+						  }
+						}
+						</script>
+					</code>
+				</pre>
+			</section>
+			<section data-background-color="rgb(85, 53, 145)">
+				<section>
+					<h2>Component interaction</h2>
+					<ul>
+						<li>@Input()</li>
+						<li>@ViewChild()</li>
+						<li>EventEmitter and @Output()</li>
+						<li>Service</li>
+					</ul>
+				</section>
+				<section>
+					<br>
+					<h5 style="margin: -50px 0 0px 0;">@Input()</h5>
+					<pre style="top: 0px">
+						<code data-trim data-noescape>
+							<script type="text/template">
+							// ParentComponent
+							@Component({
+							  selector: 'app-parent',
+							  template: `<app-child[headline]="'Child headline'"></app-child>`
+							})
+							
+							export class ParentComponent{}
+							</script>
+						</code>
+					</pre>
+					<pre style="top: -50px">
+						<code data-trim data-noescape>
+							<script type="text/template">
+								// ChildComponent
+								@Component({
+								  selector: 'app-child',
+								  template: `<h1>{{headline}}</h1>`
+								})
+								export class ChildComponent{
+								  @Input() headline: string = 'Default child headline';
+								}
+							</script>
+						</code>
+					</pre>
+				</section>
+				<section>
+					<br>
+					<h5 style="margin: -50px 0 0px 0;">@ViewChild()</h5>
+					<pre style="top: -20px">
+						<code data-trim data-noescape>
+							<script type="text/template">
+								// ParentComponent
+								@Component({
+								  selector: 'app-parent',
+								  template: `<app-child></app-child>`
+								})
+								export class ParentComponent implements AfterViewInit{
+								  @ViewChild(ChildComponent) child: ChildComponent;
+
+								  ngAfterViewInit(){child.headline = 'Child headline';}
+								}	
+							</script>
+						</code>
+					</pre>
+					<pre style="top: -70px">
+						<code data-trim data-noescape>
+							<script type="text/template">
+							// ChildComponent
+							@Component({
+							  selector: 'app-child',
+							  template: `<h1>{{headline}}</h1>`
+							})
+							export class ChildComponent{
+							  headline: string = '';
+							}
+							</script>
+						</code>
+					</pre>
+				</section>
+				<section>
+					<br>
+					<h5 style="margin: -50px 0 0px 0;">EventEmitter and @Output()</h5>
+					<pre style="top: -20px">
+						<code data-trim data-noescape>
+							<script type="text/template">
+							// ParentComponent
+							@Component({
+							  selector: 'app-parent',
+							  template: `<p>Message: {{message || '-'}}</p>
+							  <app-child (message)='setMessage($event)'></app-child>`
+							  })
+							export class ParentComponent{
+							  message: string;
+							  setMessage(message: string){this.message = message;}
+							}		  
+							</script>
+						</code>
+					</pre>
+					<pre style="top: -70px">
+						<code data-trim data-noescape>
+							<script type="text/template">
+							// ChildComponent
+							@Component({
+							  selector: 'app-child',
+							  template: `<button (click)="sendData()">Send data</button>`
+							})
+							export class ChildComponent{
+							  @Output() message: EventEmitter = new EventEmitter() <!-- -->;
+							  sendData(){this.message.emit('Child');}
+							}
+							</script>
+						</code>
+					</pre>
+				</section>
+				<section>
+					<br>
+					<h5 style="margin: -50px 0 0px 0;">Service</h5>
+					<pre style="top: -30px; font-size: 0.42em;">
+						<code data-trim data-noescape>
+							<script type="text/template">
+							// Service
+							@Injectable({providedIn: 'root'})
+							export class DataService{
+							  data: number = 1;
+							}	  
+							</script>
+						</code>
+					</pre>
+					<pre style="top: -90px; font-size: 0.42em;">
+						<code data-trim data-noescape>
+							<script type="text/template">
+							// firstComponent
+							@Component({
+							  selector: 'app-first',
+							  template: `<p>First</p>`
+							})
+							export class FirstComponent{
+							  constructor(private dataService: DataService){
+							    console.log(dataService.data); // 1
+							    dataService.data = 3;
+							  }
+							}
+							</script>
+						</code>
+					</pre>
+					<pre style="top: -150px; font-size: 0.42em;">
+						<code data-trim data-noescape>
+							<script type="text/template">
+							// secondComponent
+							@Component({
+							  selector: 'app-second',
+							  template: `<p>Second</p>`
+							})
+							export class SecondComponent{
+ 						  constructor(private dataService: DataService){
+							    console.log(dataService.data); // 3
+							  }
+							}
+							</script>
+						</code>
+					</pre>
+				</section>
+			</section>
+			<section>
+				<section data-background-color="rgb(85, 53, 145)">
+					<h2>component lifecycle</h2>
+					<p class="fragment" data-fragment-index="1">ngOnChanges()</p>
+					<p class="fragment" data-fragment-index="2">ngOnInit()</p>
+					<p class="fragment" data-fragment-index="3">ngDoCheck()</p>
+					<p class="fragment" data-fragment-index="4">ngAfterContentInit()</p>
+					<p class="fragment" data-fragment-index="5">ngAfterContentChecked()</p>
+					<p class="fragment" data-fragment-index="6">ngAfterViewInit()</p>
+					<p class="fragment" data-fragment-index="7">ngAfterViewChecked()</p>
+					<p class="fragment" data-fragment-index="8">ngOnDestroy()</p>
+				</section>
+				<section data-background-color="rgb(85, 53, 145)">
+					<h2>example lifecycle</h2>
+					<pre style="top: -30px; font-size: 0.42em; height: 60vh;">
+						<code data-trim data-noescape>
+							<script type="text/template">
+							@Component({
+							  selector: 'my-app',
+							  templateUrl: './my-app.component.html'
+							})
+	
+							export class AppComponent implements
+							OnChanges, OnInit, DoCheck, AfterContentInit, AfterContentChecked,
+							AfterViewInit, AfterViewChecked, OnDestroy{
+	
+							  ngOnChanges(){
+							    console.log('OnChanges');
+							  }
+						  
+				  	  ngOnInit(){
+							    console.log('OnInit');
+				  	  }
+						  
+					    ngDoCheck(){
+							    console.log('DoCheck');
+				  	  }
+						  
+					    ngAfterContentInit(){
+							    console.log('AfterContentInit');
+					    }
+						  
+				  	  ngAfterContentChecked(){
+							    console.log('AfterContentChecked');
+					    }
+						  
+				  	  ngAfterViewInit(){
+				       console.log('AfterViewInit');
+					    }
+						  
+					    ngAfterViewChecked(){
+			        console.log('AfterViewChecked');
+						   }
+							  
+					    ngOnDestroy(){
+						     console.log('OnDestroy');
+						   }
+					  }
+					</script>
+						</code>
+					</pre>
+				</section>
+			</section>
+			<section data-background-color="rgb(85, 53, 145)">
+				<section>
+					<h3>Directives</h3>
+					<ul>
+						<li>*ngIf</li>
+						<li>*ngFor</li>
+						<li>ngSwitch</li>
+						<li>ngStyle</li>
+						<li>ngClass</li>
+					</ul>
+				</section>
+				<section>
+					<h3 style="font-size: 30px;">Structural Directives</h3>
+					<pre>
+					<code data-trim data-noescape>
+						<script type="text/template">
+							// *ngIf
+							<div *ngIf="true">This will be added to the DOM</div>
+							<div *ngIf="false">This will be removed from the DOM</div>
+						</script>	
+					</code>
+					<code data-trim data-noescape>
+						<script type="text/template">
+							// *ngFor
+							<ul>
+							  <li *ngFor="let car of cars; let i = index">
+							    {{i + 1}}. {{car.name}}, {{car.year}}
+							  </li>
+							</ul>
+						</script>	
+					</code>
+					<code data-trim data-noescape>
+						<script type="text/template">
+							// ngSwitch
+							<div [ngSwitch]="car">
+							  <p *ngSwitchCase="'Audi'">This is Audi</p>
+							  <p *ngSwitchCase="'BMW'">This is BMW</p>
+							  <p *ngSwitchDefault>Car is undefined</p>
+							</div>
+						</script>	
+					</code>
+				</pre>
+				</section>
+				<section>
+					<h3 style="font-size: 30px;">Attribute directives</h3>
+					<pre>
+					<code data-trim data-noescape>
+						<script type="text/template">
+							// ngStyle
+							elementStyles: any = {
+							  color: 'red', 
+							  opacity: 0.5
+							};
+
+							<div [ngStyle]="elementStyles">Some text</div>
+						</script>	
+					</code>
+					<code data-trim data-noescape>
+						<script type="text/template">
+							// ngClass
+							<div [ngClass]="{'label': true}">Some text</div>
+						</script>	
+					</code>
+				</pre>
+				</section>
+			</section>
+			<section data-background-color="rgb(85, 53, 145)">
+				<h3>Pipe</h3>
+				<pre style="height: 50vh;">
+					<code data-trim data-noescape>
+						<script type="text/template">
+						@Component({
+						  selector: 'date-pipe-example',
+						  template: `
+						  <div>{{ exampleDate | date : 'dd.MM.yyyy' }}</div> // 04.01.2020
+						  <div>{{ exampleString | uppercase }}</div> // HELLO WORLD!
+						  <div>{{ exampleString | lowercase }}</div> // hello world!
+						  <div>{{ exampleNumber | number : '3.5-5' }}</div> // 003.14150
+						  <div>{{ exampleString | slice:6:11 }}</div> // World
+						  `
+						})
+						export class DatePipeExampleComponent {
+						  exampleDate = new Date(2021, 0, 4);
+						  exampleString = 'Hello World!';
+						  exampleNumber = 3.1415;
+						}
+						</script>
+					</code>
+				</pre>
+			</section>
+			<section data-background-color="rgb(85, 53, 145)">
+				<h3>Service</h3>
+				<section>
+					<pre style="height: 50vh;">
+						<code data-trim data-noescape>
+							<script type="text/template">
+		// data acquisition services
+		import {Injectable} from '@angular/core';
+		import {HttpClient} from '@angular/common/http';
+		
+		@Injectable({providedIn: 'root'})
+		export class UsersHttpService{
+		  constructor(private http: HttpClient){}
+		
+		  getUsers(): Observable<any>{
+			return this.http.get('/api/users');
+		  }
+		}
+							</script>
+						</code>
+					</pre>
+				</section>
+				<section>
+					<pre style="top: 35px; height: 65vh;">
+						<code data-trim data-noescape>
+							<script type="text/template">
+		// state storage services
+		import {Injectable} from '@angular/core';
+    
+		@Injectable({providedIn: 'root'})
+	
+  export class StatesService{
+    private _filtersState: any = {
+      accounts: {
+        all: true,
+          opened: false
+        }
+    };
+      
+    setFilter(filter: string: state: any): void{
+      this._filtersState[filter] = state'
+    }
+    
+    getFilter(filter: string = null): any{
+      return this._filtersState[filter] || this._filterState;
+    }
+  }
+							</script>
+						</code>
+					</pre>
+				</section>
+				<section>
+					<pre style="top: 35px; height: 62vh;">
+						<code data-trim data-noescape>
+							<script type="text/template">
+		// services for data processing
+		import {Injectable} from '@angular/core';
+    
+  @Injectable({providedIn: 'root'})
+  export class StatesService{
+    private _filtersState: any = {
+      accounts: {
+        all: true,
+        opened: false
+      }
+    };
+        
+    setFilter(filter: string: state: any): void{
+      this._filtersState[filter] = state'
+    }
+      
+    getFilter(filter: string = null): any{
+      return this._filtersState[filter] || this._filterState;
+    }
+  }
+							</script>
+						</code>
+					</pre>
+				</section>
+			</section>
+			<section>
+				<h3>Routing</h3>
+				<pre>
+					<code data-trim data-noescape>
+						import {NgModule} from '@angular/core';
+    		import {RouterModule} from '@angular/router';
+
+    		...
+
+						const routes: Routes = [{<code class="fragment" data-fragment-index="1">path: 'contacts', </code><code class="fragment" data-fragment-index="2">redirectTo: '/home', </code><code class="fragment" data-fragment-index="3">pathMatch: 'full',
+						</code><code class="fragment" data-fragment-index="4">children: [ {path: 'director', component: DirectorComponent}]</code>}];
+
+    		@NgModule({
+    		  imports: [RouterModule.forRoot(routes)],
+    		  exports: [RouterModule]
+    		})
+    		export class AppRoutingModule{}
+					</code>
+				</pre>
+			</section>
+		</div>
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
+
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+		});
+	</script>
+</body>
+
+</html>
