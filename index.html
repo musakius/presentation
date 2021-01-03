@@ -480,47 +480,25 @@
 		// services for data processing
 		import {Injectable} from '@angular/core';
     
-  @Injectable({providedIn: 'root'})
-  export class StatesService{
-    private _filtersState: any = {
-      accounts: {
-        all: true,
-        opened: false
-      }
-    };
+    @Injectable({providedIn: 'root'})
+    export class MathService{
+      getFactorial(value: number): number{
+        let factorial = 1;
         
-    setFilter(filter: string: state: any): void{
-      this._filtersState[filter] = state'
-    }
+        for(let i = 1; i <= value; i++)
+          factorial *= i;
+          
+        return factorial;
+      }
       
-    getFilter(filter: string = null): any{
-      return this._filtersState[filter] || this._filterState;
+      getPercent(value: number, from: number): number{
+        return Number((value / from * 100).toFixed(2));
+      }
     }
-  }
 							</script>
 						</code>
 					</pre>
 				</section>
-			</section>
-			<section>
-				<h3>Routing</h3>
-				<pre>
-					<code data-trim data-noescape>
-						import {NgModule} from '@angular/core';
-    		import {RouterModule} from '@angular/router';
-
-    		...
-
-						const routes: Routes = [{<code class="fragment" data-fragment-index="1">path: 'contacts', </code><code class="fragment" data-fragment-index="2">redirectTo: '/home', </code><code class="fragment" data-fragment-index="3">pathMatch: 'full',
-						</code><code class="fragment" data-fragment-index="4">children: [ {path: 'director', component: DirectorComponent}]</code>}];
-
-    		@NgModule({
-    		  imports: [RouterModule.forRoot(routes)],
-    		  exports: [RouterModule]
-    		})
-    		export class AppRoutingModule{}
-					</code>
-				</pre>
 			</section>
 		</div>
 	</div>
